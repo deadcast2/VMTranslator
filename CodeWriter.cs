@@ -8,6 +8,26 @@ namespace VMTranslator
 {
     static class CodeWriter
     {
+        private static Dictionary<string, string> _SegmentNameMap = new Dictionary<string, string>
+        {
+            { "local", "LCL" },
+            { "argument", "ARG" },
+            { "this", "THIS" },
+            { "that", "THAT" }
+        };
+
+        private static Dictionary<string, string> _TempMap = new Dictionary<string, string>
+        {
+            { "0", "5" },
+            { "1", "6" },
+            { "2", "7" },
+            { "3", "8" },
+            { "4", "9" },
+            { "5", "10" },
+            { "6", "11" },
+            { "7", "12" },
+        };
+
         public static string WriteComparators()
         {
             var equals = 
@@ -87,22 +107,23 @@ $@"@CODE
             switch (operation)
             {
                 case "add":
-                    return "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M+D\nM=D\n@SP\nM=M+1";
+                    return "// Add\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M+D\nM=D\n@SP\nM=M+1";
                 case "sub":
-                    return "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M-D\nM=D\n@SP\nM=M+1";
+                    return "// Subtract\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M-D\nM=D\n@SP\nM=M+1";
                 case "neg":
-                    return "@SP\nM=M-1\nA=M\nD=-M\nM=D\n@SP\nM=M+1";
+                    return "// Negate\n@SP\nM=M-1\nA=M\nD=-M\nM=D\n@SP\nM=M+1";
                 case "and":
-                    return "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D&M\nM=D\n@SP\nM=M+1";
+                    return "// And\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D&M\nM=D\n@SP\nM=M+1";
                 case "or":
-                    return "@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D|M\nM=D\n@SP\nM=M+1";
+                    return "// Or\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D|M\nM=D\n@SP\nM=M+1";
                 case "not":
-                    return "@SP\nM=M-1\nA=M\nD=!M\nM=D\n@SP\nM=M+1";
+                    return "// Not\n@SP\nM=M-1\nA=M\nD=!M\nM=D\n@SP\nM=M+1";
                 case "eq":
                 case "lt":
                 case "gt":
                     return 
-$@"@SP
+$@"// {operation}
+@SP
 M=M-1
 A=M
 D=M
@@ -132,7 +153,84 @@ M=M+1";
             switch (segment)
             {
                 case "constant":
-                    return $"@{value}\nD=A\n@SP\nA=M\nM=D\n@SP\nD=M\nM=D+1";
+                    return 
+$@"// Push {segment} {value}
+@{value}
+D=A
+@SP
+A=M
+M=D
+@SP
+D=M
+M=D+1";
+                case "local":
+                case "this":
+                case "that":
+                case "argument":
+                    return
+$@"// Pop {segment} {value}
+@{value}
+D=A
+@{_SegmentNameMap[segment]}
+D=M+D
+A=D
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1";
+                case "temp":
+                    return
+$@"// Pop {segment} {value}
+@{_TempMap[value]}
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1";
+                default:
+                    return null;
+            }
+        }
+
+        public static string WritePop(string segment, string value)
+        {
+            switch (segment)
+            {
+                case "local":
+                case "argument":
+                case "this":
+                case "that":
+                    return
+$@"// Pop {segment} {value}
+@SP
+M=M-1
+A=M
+D=M
+@R13
+M=D
+@{value}
+D=A
+@{_SegmentNameMap[segment]}
+D=M+D
+@R14
+M=D
+@R13
+D=M
+@R14
+A=M
+M=D";
+                case "temp":
+                    return
+$@"// Pop {segment} {value}
+@SP
+M=M-1
+A=M
+D=M
+@{_TempMap[value]}
+M=D";
                 default:
                     return null;
             }

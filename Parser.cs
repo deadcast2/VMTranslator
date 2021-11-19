@@ -40,6 +40,9 @@ namespace VMTranslator
                     case CommandType.C_PUSH:
                         assemblyLines.Add(CodeWriter.WritePush(arg1, arg2));
                         break;
+                    case CommandType.C_POP:
+                        assemblyLines.Add(CodeWriter.WritePop(arg1, arg2));
+                        break;
                 }
             }
 
