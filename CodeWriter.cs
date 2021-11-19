@@ -206,6 +206,16 @@ A=M
 M=D
 @SP
 M=M+1";
+                case "static":
+                    return
+$@"// Push {segment} {value}
+@{int.Parse(value) + 16}
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1";
                 default:
                     return null;
             }
@@ -255,6 +265,15 @@ M=M-1
 A=M
 D=M
 @{_PointerMap[value]}
+M=D";
+                case "static":
+                    return
+$@"// Pop {segment} {value}
+@SP
+M=M-1
+A=M
+D=M
+@{int.Parse(value) + 16}
 M=D";
                 default:
                     return null;
