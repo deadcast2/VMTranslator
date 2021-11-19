@@ -25,7 +25,13 @@ namespace VMTranslator
             { "4", "9" },
             { "5", "10" },
             { "6", "11" },
-            { "7", "12" },
+            { "7", "12" }
+        };
+
+        private static Dictionary<string, string> _PointerMap = new Dictionary<string, string>
+        {
+            { "0", "3" },
+            { "1", "4" }
         };
 
         public static string WriteComparators()
@@ -168,7 +174,7 @@ M=D+1";
                 case "that":
                 case "argument":
                     return
-$@"// Pop {segment} {value}
+$@"// Push {segment} {value}
 @{value}
 D=A
 @{_SegmentNameMap[segment]}
@@ -182,8 +188,18 @@ M=D
 M=M+1";
                 case "temp":
                     return
-$@"// Pop {segment} {value}
+$@"// Push {segment} {value}
 @{_TempMap[value]}
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1";
+                case "pointer":
+                    return
+$@"// Push {segment} {value}
+@{_PointerMap[value]}
 D=M
 @SP
 A=M
@@ -230,6 +246,15 @@ M=M-1
 A=M
 D=M
 @{_TempMap[value]}
+M=D";
+                case "pointer":
+                    return
+$@"// Pop {segment} {value}
+@SP
+M=M-1
+A=M
+D=M
+@{_PointerMap[value]}
 M=D";
                 default:
                     return null;
