@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace VMTranslator
 {
@@ -113,17 +109,81 @@ $@"@CODE
             switch (operation)
             {
                 case "add":
-                    return "// Add\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M+D\nM=D\n@SP\nM=M+1";
+                    return
+@"// Add
+@SP
+M=M-1
+A=M
+D=M
+@SP
+M=M-1
+A=M
+D=M+D
+M=D
+@SP
+M=M+1";
                 case "sub":
-                    return "// Subtract\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=M-D\nM=D\n@SP\nM=M+1";
+                    return 
+@"// Subtract
+@SP
+M=M-1
+A=M
+D=M
+@SP
+M=M-1
+A=M
+D=M-D
+M=D
+@SP
+M=M+1";
                 case "neg":
-                    return "// Negate\n@SP\nM=M-1\nA=M\nD=-M\nM=D\n@SP\nM=M+1";
+                    return 
+@"// Negate
+@SP
+M=M-1
+A=M
+D=-M
+M=D
+@SP
+M=M+1";
                 case "and":
-                    return "// And\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D&M\nM=D\n@SP\nM=M+1";
+                    return 
+@"// And
+@SP
+M=M-1
+A=M
+D=M
+@SP
+M=M-1
+A=M
+D=D&M
+M=D
+@SP
+M=M+1";
                 case "or":
-                    return "// Or\n@SP\nM=M-1\nA=M\nD=M\n@SP\nM=M-1\nA=M\nD=D|M\nM=D\n@SP\nM=M+1";
+                    return 
+@"// Or
+@SP
+M=M-1
+A=M
+D=M
+@SP
+M=M-1
+A=M
+D=D|M
+M=D
+@SP
+M=M+1";
                 case "not":
-                    return "// Not\n@SP\nM=M-1\nA=M\nD=!M\nM=D\n@SP\nM=M+1";
+                    return 
+@"// Not
+@SP
+M=M-1
+A=M
+D=!M
+M=D
+@SP
+M=M+1";
                 case "eq":
                 case "lt":
                 case "gt":
