@@ -356,5 +356,13 @@ D=M
 @{label}
 D;JNE";
         }
+
+        public static string WriteGoto(string label)
+        {
+            return
+$@"// Goto {label}
+@{label}
+0;JMP";
+        }
     }
 }

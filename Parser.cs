@@ -49,6 +49,9 @@ namespace VMTranslator
                     case CommandType.C_IF:
                         assemblyLines.Add(CodeWriter.WriteIf(arg1));
                         break;
+                    case CommandType.C_GOTO:
+                        assemblyLines.Add(CodeWriter.WriteGoto(arg1));
+                        break;
                 }
             }
 
@@ -112,6 +115,11 @@ namespace VMTranslator
             {
                 arg1 = GetArg1(line);
                 return CommandType.C_IF;
+            }
+            else if (line.StartsWith("goto"))
+            {
+                arg1 = GetArg1(line);
+                return CommandType.C_GOTO;
             }
 
             return CommandType.C_UNKNOWN;
