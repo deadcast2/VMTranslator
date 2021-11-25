@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace VMTranslator
 {
@@ -363,6 +365,83 @@ D;JNE";
 $@"// Goto {label}
 @{label}
 0;JMP";
+        }
+
+        public static string WriteFunction(string name, string argumentCount)
+        {
+            var code = $"// Function {name} {argumentCount}";
+
+            int.TryParse(argumentCount, out int count);
+
+            var pushes = Enumerable.Range(0, count).Select(i => WritePush("constant", "0"));
+
+            return $"{code}\n{string.Join("\n", pushes)}";
+        }
+
+        public static string WriteReturn()
+        {
+            return
+$@"// Return
+// Store frame location
+@LCL
+D=M
+@R13
+M=D
+// Store return address
+@5
+D=A
+@R13
+D=M-D
+A=D
+D=M
+@R14
+M=D
+// Store arg and restore stack pointer
+@SP
+M=M-1
+A=M
+D=M
+@ARG
+A=M
+M=D
+@ARG
+D=M
+@SP
+M=D+1
+// Restore that
+@R13
+D=M-1
+A=D
+D=M
+@THAT
+M=D
+// Restore this
+@2
+D=A
+@R13
+D=M-D
+A=D
+D=M
+@THIS
+M=D
+// Restore argument
+@3
+D=A
+@R13
+D=M-D
+A=D
+D=M
+@ARG
+M=D
+// Restore local
+@4
+D=A
+@R13
+D=M-D
+A=D
+D=M
+@LCL
+M=D";
         }
     }
 }

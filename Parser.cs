@@ -52,6 +52,12 @@ namespace VMTranslator
                     case CommandType.C_GOTO:
                         assemblyLines.Add(CodeWriter.WriteGoto(arg1));
                         break;
+                    case CommandType.C_FUNCTION:
+                        assemblyLines.Add(CodeWriter.WriteFunction(arg1, arg2));
+                        break;
+                    case CommandType.C_RETURN:
+                        assemblyLines.Add(CodeWriter.WriteReturn());
+                        break;
                 }
             }
 
@@ -120,6 +126,16 @@ namespace VMTranslator
             {
                 arg1 = GetArg1(line);
                 return CommandType.C_GOTO;
+            }
+            else if (line.StartsWith("function"))
+            {
+                arg1 = GetArg1(line);
+                arg2 = GetArg2(line);
+                return CommandType.C_FUNCTION;
+            }
+            else if (line.StartsWith("return"))
+            {
+                return CommandType.C_RETURN;
             }
 
             return CommandType.C_UNKNOWN;
