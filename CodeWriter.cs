@@ -339,5 +339,22 @@ M=D";
                     return null;
             }
         }
+
+        public static string WriteLabel(string label)
+        {
+            return $"({label})";
+        }
+
+        public static string WriteIf(string label)
+        {
+            return 
+$@"// If goto {label}
+@SP
+M=M-1
+A=M
+D=M
+@{label}
+D;JNE";
+        }
     }
 }

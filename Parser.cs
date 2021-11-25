@@ -43,6 +43,12 @@ namespace VMTranslator
                     case CommandType.C_POP:
                         assemblyLines.Add(CodeWriter.WritePop(arg1, arg2));
                         break;
+                    case CommandType.C_LABEL:
+                        assemblyLines.Add(CodeWriter.WriteLabel(arg1));
+                        break;
+                    case CommandType.C_IF:
+                        assemblyLines.Add(CodeWriter.WriteIf(arg1));
+                        break;
                 }
             }
 
@@ -96,6 +102,16 @@ namespace VMTranslator
             {
                 arg1 = line;
                 return CommandType.C_ARITHMETIC;
+            }
+            else if (line.StartsWith("label"))
+            {
+                arg1 = GetArg1(line);
+                return CommandType.C_LABEL;
+            }
+            else if (line.StartsWith("if-goto"))
+            {
+                arg1 = GetArg1(line);
+                return CommandType.C_IF;
             }
 
             return CommandType.C_UNKNOWN;
