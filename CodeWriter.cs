@@ -48,7 +48,8 @@ M=D
         public string WriteComparators()
         {
             var equals = 
-@"(EQ)
+@"// Equals
+(EQ)
 @SP
 A=M
 D=M
@@ -69,7 +70,8 @@ A=M
 0;JMP";
 
             var lessThan =
-@"(LT)
+@"// Less than
+(LT)
 @SP
 A=M
 D=M
@@ -90,7 +92,8 @@ A=M
 0;JMP";
 
             var greaterThan =
-@"(GT)
+@"// Greater than
+(GT)
 @SP
 A=M
 D=M
@@ -111,7 +114,8 @@ A=M
 0;JMP";
 
             return 
-$@"@CODE
+$@" // Logical routines
+@CODE
 0;JMP
 {equals}
 {lessThan}
