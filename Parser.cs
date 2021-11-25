@@ -11,17 +11,32 @@ namespace VMTranslator
 
         public enum CommandType { C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL, C_UNKNOWN }
 
-        public Parser(string filepath)
+        public Parser(string outputName, string[] filepaths)
         {
-            try
-            {
-                var output = Process(File.ReadAllLines(filepath));
+            var output = new List<string>();
 
-                File.WriteAllLines(Path.ChangeExtension(filepath, "asm"), output);
-            }
-            catch (Exception ex)
+            InsertBootstrap(filepaths, output);
+
+            foreach (var filepath in filepaths)
             {
-                Console.WriteLine($"Failed to open file '{filepath}'. Error: {ex.Message}");
+                try
+                {
+                    output.AddRange(Process(File.ReadAllLines(filepath)));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to open file '{filepath}'. Error: {ex.Message}");
+                }
+            }
+
+            File.WriteAllLines($"{Path.ChangeExtension(outputName, "asm")}", output);
+        }
+
+        private void InsertBootstrap(string[] filepaths, List<string> output)
+        {
+            if (filepaths.Length > 1)
+            {
+                output.Add(_Writer.WriteBootstrap());
             }
         }
 

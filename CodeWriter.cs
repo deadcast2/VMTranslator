@@ -34,6 +34,17 @@ namespace VMTranslator
 
         private int _ReturnCount = 0;
 
+        public string WriteBootstrap()
+        {
+            return
+$@"// Bootstrap
+@256
+D=A
+@SP
+M=D
+{WriteCall("sys.init", "0")}";
+        }
+
         public string WriteComparators()
         {
             var equals = 
