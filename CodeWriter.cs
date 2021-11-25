@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace VMTranslator
@@ -34,6 +33,13 @@ namespace VMTranslator
 
         private int _ReturnCount = 0;
 
+        private string _FileName;
+
+        public void SetCurrentFileName(string name)
+        {
+            _FileName = name;
+        }
+
         public string WriteBootstrap()
         {
             return
@@ -47,7 +53,7 @@ M=D
 
         public string WriteComparators()
         {
-            var equals = 
+            var equals =
 @"// Equals
 (EQ)
 @SP
@@ -113,7 +119,7 @@ M=0
 A=M
 0;JMP";
 
-            return 
+            return
 $@" // Logical routines
 @CODE
 0;JMP
@@ -142,7 +148,7 @@ M=D
 @SP
 M=M+1";
                 case "sub":
-                    return 
+                    return
 @"// Subtract
 @SP
 M=M-1
@@ -156,7 +162,7 @@ M=D
 @SP
 M=M+1";
                 case "neg":
-                    return 
+                    return
 @"// Negate
 @SP
 M=M-1
@@ -166,7 +172,7 @@ M=D
 @SP
 M=M+1";
                 case "and":
-                    return 
+                    return
 @"// And
 @SP
 M=M-1
@@ -180,7 +186,7 @@ M=D
 @SP
 M=M+1";
                 case "or":
-                    return 
+                    return
 @"// Or
 @SP
 M=M-1
@@ -194,7 +200,7 @@ M=D
 @SP
 M=M+1";
                 case "not":
-                    return 
+                    return
 @"// Not
 @SP
 M=M-1
@@ -206,7 +212,7 @@ M=M+1";
                 case "eq":
                 case "lt":
                 case "gt":
-                    return 
+                    return
 $@"// {operation}
 @SP
 M=M-1
@@ -238,7 +244,7 @@ M=M+1";
             switch (segment)
             {
                 case "constant":
-                    return 
+                    return
 $@"// Push {segment} {value}
 @{value}
 D=A
@@ -288,7 +294,7 @@ M=M+1";
                 case "static":
                     return
 $@"// Push {segment} {value}
-@{int.Parse(value) + 16}
+@{_FileName}.{value}
 D=M
 @SP
 A=M
@@ -352,7 +358,7 @@ $@"// Pop {segment} {value}
 M=M-1
 A=M
 D=M
-@{int.Parse(value) + 16}
+@{_FileName}.{value}
 M=D";
                 default:
                     return null;
@@ -366,7 +372,7 @@ M=D";
 
         public string WriteIf(string label)
         {
-            return 
+            return
 $@"// If goto {label}
 @SP
 M=M-1

@@ -15,10 +15,12 @@ namespace VMTranslator
         {
             var output = new List<string>();
 
-            InsertBootstrap(filepaths, output);
+            InsertInitialization(filepaths, output);
 
             foreach (var filepath in filepaths)
             {
+                _Writer.SetCurrentFileName(Path.GetFileNameWithoutExtension(filepath));
+
                 try
                 {
                     output.AddRange(Process(File.ReadAllLines(filepath)));
@@ -32,18 +34,20 @@ namespace VMTranslator
             File.WriteAllLines($"{Path.ChangeExtension(outputName, "asm")}", output);
         }
 
-        private void InsertBootstrap(string[] filepaths, List<string> output)
+        private void InsertInitialization(string[] filepaths, List<string> output)
         {
             if (filepaths.Length > 1)
             {
                 output.Add(_Writer.WriteBootstrap());
             }
+
+            output.Add(_Writer.WriteComparators());
         }
 
         private string[] Process(string[] lines)
         {
             var cleanedLines = RemoveWhiteSpaceAndComments(lines);
-            var assemblyLines = new List<string>() { _Writer.WriteComparators() };
+            var assemblyLines = new List<string>();
 
             for (var i = 0; i < cleanedLines.Length; i++)
             {
