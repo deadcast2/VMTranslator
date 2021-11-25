@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace VMTranslator
 {
-    static class CodeWriter
+    class CodeWriter
     {
-        private static Dictionary<string, string> _SegmentNameMap = new Dictionary<string, string>
+        private Dictionary<string, string> _SegmentNameMap = new Dictionary<string, string>
         {
             { "local", "LCL" },
             { "argument", "ARG" },
@@ -14,7 +14,7 @@ namespace VMTranslator
             { "that", "THAT" }
         };
 
-        private static Dictionary<string, string> _TempMap = new Dictionary<string, string>
+        private Dictionary<string, string> _TempMap = new Dictionary<string, string>
         {
             { "0", "5" },
             { "1", "6" },
@@ -26,13 +26,15 @@ namespace VMTranslator
             { "7", "12" }
         };
 
-        private static Dictionary<string, string> _PointerMap = new Dictionary<string, string>
+        private Dictionary<string, string> _PointerMap = new Dictionary<string, string>
         {
             { "0", "3" },
             { "1", "4" }
         };
 
-        public static string WriteComparators()
+        private int _ReturnCount = 0;
+
+        public string WriteComparators()
         {
             var equals = 
 @"(EQ)
@@ -106,7 +108,7 @@ $@"@CODE
 (CODE)";
         }
 
-        public static string WriteArithmetic(string operation, int lineNumber)
+        public string WriteArithmetic(string operation, int lineNumber)
         {
             switch (operation)
             {
@@ -216,7 +218,7 @@ M=M+1";
             }
         }
 
-        public static string WritePush(string segment, string value)
+        public string WritePush(string segment, string value)
         {
             switch (segment)
             {
@@ -283,7 +285,7 @@ M=M+1";
             }
         }
 
-        public static string WritePop(string segment, string value)
+        public string WritePop(string segment, string value)
         {
             switch (segment)
             {
@@ -342,12 +344,12 @@ M=D";
             }
         }
 
-        public static string WriteLabel(string label)
+        public string WriteLabel(string label)
         {
             return $"({label})";
         }
 
-        public static string WriteIf(string label)
+        public string WriteIf(string label)
         {
             return 
 $@"// If goto {label}
@@ -359,7 +361,7 @@ D=M
 D;JNE";
         }
 
-        public static string WriteGoto(string label)
+        public string WriteGoto(string label)
         {
             return
 $@"// Goto {label}
@@ -367,18 +369,82 @@ $@"// Goto {label}
 0;JMP";
         }
 
-        public static string WriteFunction(string name, string argumentCount)
+        public string WriteFunction(string name, string argumentCount)
         {
-            var code = $"// Function {name} {argumentCount}";
+            var code = $"// Function {name} {argumentCount}\n({name})";
 
             int.TryParse(argumentCount, out int count);
 
-            var pushes = Enumerable.Range(0, count).Select(i => WritePush("constant", "0"));
+            var pushes = Enumerable.Range(0, count).Select(i => $"\n{WritePush("constant", "0")}");
 
-            return $"{code}\n{string.Join("\n", pushes)}";
+            return $"{code}{string.Join("", pushes)}";
         }
 
-        public static string WriteReturn()
+        public string WriteCall(string name, string argumentCount)
+        {
+            return
+$@"// Call {name} {argumentCount}
+// Push return address
+@$ret.{_ReturnCount}
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// Push local
+@LCL
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// Push argument
+@ARG
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// Push this
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// Push that
+@THAT
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// Reposition argument
+@5
+D=A
+@SP
+D=M-D
+@{argumentCount}
+D=D-A
+@ARG
+M=D
+// Reposition local
+@SP
+D=M
+@LCL
+M=D
+// Transfer control to callee
+{WriteGoto(name)}
+// Where to return once finished calling
+($ret.{_ReturnCount++})";
+        }
+
+        public string WriteReturn()
         {
             return
 $@"// Return
@@ -441,7 +507,11 @@ D=M-D
 A=D
 D=M
 @LCL
-M=D";
+M=D
+// Goto return address
+@R14
+A=M
+0;JMP";
         }
     }
 }

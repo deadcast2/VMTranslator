@@ -7,6 +7,8 @@ namespace VMTranslator
 {
     class Parser
     {
+        private CodeWriter _Writer = new CodeWriter();
+
         public enum CommandType { C_ARITHMETIC, C_PUSH, C_POP, C_LABEL, C_GOTO, C_IF, C_FUNCTION, C_RETURN, C_CALL, C_UNKNOWN }
 
         public Parser(string filepath)
@@ -26,7 +28,7 @@ namespace VMTranslator
         private string[] Process(string[] lines)
         {
             var cleanedLines = RemoveWhiteSpaceAndComments(lines);
-            var assemblyLines = new List<string>() { CodeWriter.WriteComparators() };
+            var assemblyLines = new List<string>() { _Writer.WriteComparators() };
 
             for (var i = 0; i < cleanedLines.Length; i++)
             {
@@ -35,28 +37,31 @@ namespace VMTranslator
                 switch (commandType)
                 {
                     case CommandType.C_ARITHMETIC:
-                        assemblyLines.Add(CodeWriter.WriteArithmetic(arg1, i));
+                        assemblyLines.Add(_Writer.WriteArithmetic(arg1, i));
                         break;
                     case CommandType.C_PUSH:
-                        assemblyLines.Add(CodeWriter.WritePush(arg1, arg2));
+                        assemblyLines.Add(_Writer.WritePush(arg1, arg2));
                         break;
                     case CommandType.C_POP:
-                        assemblyLines.Add(CodeWriter.WritePop(arg1, arg2));
+                        assemblyLines.Add(_Writer.WritePop(arg1, arg2));
                         break;
                     case CommandType.C_LABEL:
-                        assemblyLines.Add(CodeWriter.WriteLabel(arg1));
+                        assemblyLines.Add(_Writer.WriteLabel(arg1));
                         break;
                     case CommandType.C_IF:
-                        assemblyLines.Add(CodeWriter.WriteIf(arg1));
+                        assemblyLines.Add(_Writer.WriteIf(arg1));
                         break;
                     case CommandType.C_GOTO:
-                        assemblyLines.Add(CodeWriter.WriteGoto(arg1));
+                        assemblyLines.Add(_Writer.WriteGoto(arg1));
                         break;
                     case CommandType.C_FUNCTION:
-                        assemblyLines.Add(CodeWriter.WriteFunction(arg1, arg2));
+                        assemblyLines.Add(_Writer.WriteFunction(arg1, arg2));
                         break;
                     case CommandType.C_RETURN:
-                        assemblyLines.Add(CodeWriter.WriteReturn());
+                        assemblyLines.Add(_Writer.WriteReturn());
+                        break;
+                    case CommandType.C_CALL:
+                        assemblyLines.Add(_Writer.WriteCall(arg1, arg2));
                         break;
                 }
             }
@@ -136,6 +141,12 @@ namespace VMTranslator
             else if (line.StartsWith("return"))
             {
                 return CommandType.C_RETURN;
+            }
+            else if (line.StartsWith("call"))
+            {
+                arg1 = GetArg1(line);
+                arg2 = GetArg2(line);
+                return CommandType.C_CALL;
             }
 
             return CommandType.C_UNKNOWN;
