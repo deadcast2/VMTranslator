@@ -143,8 +143,7 @@ D=M
 @SP
 M=M-1
 A=M
-D=M+D
-M=D
+M=M+D
 @SP
 M=M+1";
                 case "sub":
@@ -157,8 +156,7 @@ D=M
 @SP
 M=M-1
 A=M
-D=M-D
-M=D
+M=M-D
 @SP
 M=M+1";
                 case "neg":
@@ -167,8 +165,7 @@ M=M+1";
 @SP
 M=M-1
 A=M
-D=-M
-M=D
+M=-M
 @SP
 M=M+1";
                 case "and":
@@ -181,8 +178,7 @@ D=M
 @SP
 M=M-1
 A=M
-D=D&M
-M=D
+M=D&M
 @SP
 M=M+1";
                 case "or":
@@ -195,8 +191,7 @@ D=M
 @SP
 M=M-1
 A=M
-D=D|M
-M=D
+M=D|M
 @SP
 M=M+1";
                 case "not":
@@ -205,8 +200,7 @@ M=M+1";
 @SP
 M=M-1
 A=M
-D=!M
-M=D
+M=!M
 @SP
 M=M+1";
                 case "eq":
