@@ -33,7 +33,7 @@ namespace VMTranslator
 
         private static void ProcessDirectory(string directory)
         {
-            var outputFile = Path.Join(Path.GetFullPath(directory), Path.GetFileName(directory));
+            var outputFile = Path.Join(Path.GetFullPath(directory), Path.GetFileName(Path.TrimEndingDirectorySeparator(directory)));
 
             new Parser(outputFile, Directory.GetFiles(directory, "*.vm"));
         }
