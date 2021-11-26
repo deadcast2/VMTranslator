@@ -120,13 +120,13 @@ A=M
 0;JMP";
 
             return
-$@" // Logical routines
-@CODE
+$@"// Logical routines
+@SKIP_LOGICAL
 0;JMP
 {equals}
 {lessThan}
 {greaterThan}
-(CODE)";
+(SKIP_LOGICAL)";
         }
 
         public string WriteArithmetic(string operation, int lineNumber)
