@@ -13,6 +13,8 @@ namespace VMTranslator
 
         public Parser(string outputName, string[] filepaths)
         {
+            if (filepaths.Length == 0) throw new ArgumentException("At least one file path to translate should be provided.");
+
             var output = new List<string>();
 
             InsertInitialization(filepaths, output);
@@ -21,14 +23,7 @@ namespace VMTranslator
             {
                 _Writer.SetCurrentFileName(Path.GetFileNameWithoutExtension(filepath));
 
-                try
-                {
-                    output.AddRange(Process(File.ReadAllLines(filepath)));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to open file '{filepath}'. Error: {ex.Message}");
-                }
+                output.AddRange(Process(File.ReadAllLines(filepath)));
             }
 
             File.WriteAllLines($"{Path.ChangeExtension(outputName, "asm")}", output);

@@ -7,23 +7,35 @@ namespace VMTranslator
     {
         static void Main(string[] args)
         {
-            if (args.Length > 0)
+            try
             {
-                if (Directory.Exists(args[0]))
+                if (args.Length > 0)
                 {
-                    var outputFile = Path.Join(Path.GetFullPath(args[0]), Path.GetFileName(args[0]));
-
-                    new Parser(outputFile, Directory.GetFiles(args[0], "*.vm"));
+                    if (Directory.Exists(args[0]))
+                    {
+                        ProcessDirectory(args[0]);
+                    }
+                    else
+                    {
+                        new Parser(Path.GetFullPath(args[0]), args);
+                    }
                 }
                 else
                 {
-                    new Parser(Path.GetFullPath(args[0]), args);
+                    ProcessDirectory(Directory.GetCurrentDirectory());
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("A file path or directory must be specified. For example: VMTranslator myProg.vm");
+                Console.WriteLine(ex.ToString());
             }
+        }
+
+        private static void ProcessDirectory(string directory)
+        {
+            var outputFile = Path.Join(Path.GetFullPath(directory), Path.GetFileName(directory));
+
+            new Parser(outputFile, Directory.GetFiles(directory, "*.vm"));
         }
     }
 }
