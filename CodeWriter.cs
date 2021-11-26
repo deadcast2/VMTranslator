@@ -246,8 +246,7 @@ D=A
 A=M
 M=D
 @SP
-D=M
-M=D+1";
+M=M+1";
                 case "local":
                 case "this":
                 case "that":
